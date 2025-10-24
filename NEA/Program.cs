@@ -13,7 +13,7 @@ namespace ConsoleApp1
 
         static void Main(string[] args)
         {
-            Console.WriteLine("Matrix Calculator Press Enter to Continue !");
+            Console.WriteLine("Matrix Calculator Press Enter to Continue!!");
 
             while (true)
             {
@@ -318,7 +318,27 @@ namespace ConsoleApp1
                 }
                 else //pivot =0 error
                 {
+                    for (int j = 0; j < col; j++)
+                    {
+                        double temp = matrix[i, j];
+                        matrix[i,j] = matrix[i+1,j];
+                        matrix[i+1,j]= temp;
+                        matrix[i, j] /= pivot;
+                        id[i, j] /= pivot;
+                    }
 
+                    for (int j = 0; j < row; j++)
+                    {
+                        if (i != j)
+                        {
+                            double multiplier = matrix[j, i];
+                            for (int k = 0; k < col; k++)
+                            {
+                                matrix[j, k] -= matrix[i, k] * multiplier;
+                                id[j, k] -= id[i, k] * multiplier;
+                            }
+                        }
+                    }
                 }
             }
 
