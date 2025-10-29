@@ -9,7 +9,7 @@ namespace ConsoleApp1
     internal class Program
     {
         const int Max = 5;
-        static double[][,] matrices = new double[3][,];
+        static double[][,] matrices = new double[6][,]; // 6 slots 1-3 normal matrices 4-6 inverse
 
         static void Main(string[] args)
         {
@@ -46,8 +46,8 @@ namespace ConsoleApp1
 
         static void Input()
         {
-            Console.Write("Select matrix (1-3): ");
-            if (!int.TryParse(Console.ReadLine(), out int matrixNumber) || matrixNumber < 1 || matrixNumber > 3)
+            Console.Write("Select matrix (1-6): ");
+            if (!int.TryParse(Console.ReadLine(), out int matrixNumber) || matrixNumber < 1 || matrixNumber > 6)
             {
                 Console.WriteLine("Invalid matrix number.");
                 return;
@@ -99,14 +99,16 @@ namespace ConsoleApp1
                     continue;
                 }
 
-                Console.WriteLine($"\nMatrix{i + 1} ({matrices[i].GetLength(0)}x{matrices[i].GetLength(1)}):");
+                string matrixType = (i >= 3) ? " (Inverse)" : ""; 
+                Console.WriteLine($"\nMatrix{i + 1}{matrixType} ({matrices[i].GetLength(0)}x{matrices[i].GetLength(1)}):");
                 PrintMatrix(matrices[i]);
             }
         }
 
+        //update to allow 6
         static bool MatrixValidity(int matrixNumber)
         {
-            if (matrixNumber < 0 || matrixNumber > 2 || matrices[matrixNumber] == null)
+            if (matrixNumber < 0 || matrixNumber > 5 || matrices[matrixNumber] == null) 
             {
                 Console.WriteLine("Matrix does not exist!");
                 return false;
@@ -116,16 +118,16 @@ namespace ConsoleApp1
 
         static void Add()
         {
-            Console.Write("Select first matrix (1-3): ");
-            if (!int.TryParse(Console.ReadLine(), out int m1) || m1 < 1 || m1 > 3)
+            Console.Write("Select first matrix (1-6): "); 
+            if (!int.TryParse(Console.ReadLine(), out int m1) || m1 < 1 || m1 > 6)
             {
                 Console.WriteLine("Invalid matrix number.");
                 return;
             }
             m1--;
 
-            Console.Write("Select second matrix (1-3): ");
-            if (!int.TryParse(Console.ReadLine(), out int m2) || m2 < 1 || m2 > 3)
+            Console.Write("Select second matrix (1-6): "); 
+            if (!int.TryParse(Console.ReadLine(), out int m2) || m2 < 1 || m2 > 6)
             {
                 Console.WriteLine("Invalid matrix number.");
                 return;
@@ -154,16 +156,16 @@ namespace ConsoleApp1
 
         static void Subtract()
         {
-            Console.Write("Select first matrix (1-3): ");
-            if (!int.TryParse(Console.ReadLine(), out int m1) || m1 < 1 || m1 > 3)
+            Console.Write("Select first matrix (1-6): "); // Updated to 6
+            if (!int.TryParse(Console.ReadLine(), out int m1) || m1 < 1 || m1 > 6)
             {
                 Console.WriteLine("Invalid matrix number.");
                 return;
             }
             m1--;
 
-            Console.Write("Select second matrix (1-3): ");
-            if (!int.TryParse(Console.ReadLine(), out int m2) || m2 < 1 || m2 > 3)
+            Console.Write("Select second matrix (1-6): "); // Updated to 6
+            if (!int.TryParse(Console.ReadLine(), out int m2) || m2 < 1 || m2 > 6)
             {
                 Console.WriteLine("Invalid matrix number.");
                 return;
@@ -177,7 +179,7 @@ namespace ConsoleApp1
 
             if (A.GetLength(0) != B.GetLength(0) || A.GetLength(1) != B.GetLength(1))
             {
-                Console.WriteLine("Subtraction not possible ( mismatch in size).");
+                Console.WriteLine("Subtraction not possible (mismatch in size).");
                 return;
             }
 
@@ -186,22 +188,22 @@ namespace ConsoleApp1
                 for (int j = 0; j < A.GetLength(1); j++)
                     result[i, j] = A[i, j] - B[i, j];
 
-            Console.WriteLine("\nResults :");
+            Console.WriteLine("\nResults:");
             PrintMatrix(result);
         }
 
         static void Multiply()
         {
-            Console.Write("Select first matrix (1-3): ");
-            if (!int.TryParse(Console.ReadLine(), out int m1) || m1 < 1 || m1 > 3)
+            Console.Write("Select first matrix (1-6): "); // Updated to 6
+            if (!int.TryParse(Console.ReadLine(), out int m1) || m1 < 1 || m1 > 6)
             {
                 Console.WriteLine("Invalid matrix number.");
                 return;
             }
             m1--;
 
-            Console.Write("Select second matrix (1-3): ");
-            if (!int.TryParse(Console.ReadLine(), out int m2) || m2 < 1 || m2 > 3)
+            Console.Write("Select second matrix (1-6): "); // Updated to 6
+            if (!int.TryParse(Console.ReadLine(), out int m2) || m2 < 1 || m2 > 6)
             {
                 Console.WriteLine("Invalid matrix number.");
                 return;
@@ -241,10 +243,10 @@ namespace ConsoleApp1
 
         static void Special(string choice)
         {
-            Console.Write("Select matrix (1-3): ");
+            Console.Write("Select matrix (1-3): "); // Only  matrices 1-3 for "special operations"
             if (!int.TryParse(Console.ReadLine(), out int m1) || m1 < 1 || m1 > 3)
             {
-                Console.WriteLine("Invalid matrix number.");
+                Console.WriteLine("Invalid matrix number. Only matrices 1-3 can be used for this operation.");
                 return;
             }
             m1--;
@@ -276,12 +278,16 @@ namespace ConsoleApp1
             int row = matrix.GetLength(0);
             int col = matrix.GetLength(1);
             double det = Determinant(matrix);
-            if (Math.Abs(det) <=0)
+            if (Math.Abs(det) <= 0)
             {
-                Console.WriteLine("Matrix determinant = 0. Inverse cannot be caluclated.");
+                Console.WriteLine("Matrix determinant = 0. Inverse cannot be calculated.");
                 return;
             }
-            double[,] id = new double[row,row];
+
+            // Creating clones to avoid changing original matrix
+            double[,] CloneMatrix = (double[,])matrix.Clone();
+            double[,] id = new double[row, row];
+
             for (int i = 0; i < row; i++)
             {
                 for (int j = 0; j < row; j++)
@@ -292,14 +298,16 @@ namespace ConsoleApp1
                         id[i, j] = 0;
                 }
             }
+
             for (int i = 0; i < row; i++)
             {
-                double pivot = matrix[i, i];
-                if (pivot == 0)
+                double pivot = CloneMatrix[i, i];
+                if (pivot != 0)
                 {
+                    // Use workingMatrix instead of matrix
                     for (int j = 0; j < col; j++)
                     {
-                        matrix[i, j] /= pivot;
+                        CloneMatrix[i, j] /= pivot;
                         id[i, j] /= pivot;
                     }
 
@@ -307,23 +315,23 @@ namespace ConsoleApp1
                     {
                         if (i != j)
                         {
-                            double multiplier = matrix[j, i];
+                            double multiplier = CloneMatrix[j, i];
                             for (int k = 0; k < col; k++)
                             {
-                                matrix[j, k] -= matrix[i, k] * multiplier;
+                                CloneMatrix[j, k] -= CloneMatrix[i, k] * multiplier;
                                 id[j, k] -= id[i, k] * multiplier;
                             }
                         }
                     }
                 }
-                else //pivot =0 error
+                else //pivot = 0 row swap
                 {
                     for (int j = 0; j < col; j++)
                     {
-                        double temp = matrix[i, j];
-                        matrix[i,j] = matrix[i+1,j];
-                        matrix[i+1,j]= temp;
-                        matrix[i, j] /= pivot;
+                        double temp = CloneMatrix[i, j];
+                        CloneMatrix[i, j] = CloneMatrix[i + 1, j];
+                        CloneMatrix[i + 1, j] = temp;
+                        CloneMatrix[i, j] /= pivot;
                         id[i, j] /= pivot;
                     }
 
@@ -331,17 +339,16 @@ namespace ConsoleApp1
                     {
                         if (i != j)
                         {
-                            double multiplier = matrix[j, i];
+                            double multiplier = CloneMatrix[j, i];
                             for (int k = 0; k < col; k++)
                             {
-                                matrix[j, k] -= matrix[i, k] * multiplier;
+                                CloneMatrix[j, k] -= CloneMatrix[i, k] * multiplier;
                                 id[j, k] -= id[i, k] * multiplier;
                             }
                         }
                     }
                 }
             }
-
 
             double[,] inverse = new double[row, row];
             for (int i = 0; i < row; i++)
@@ -350,6 +357,23 @@ namespace ConsoleApp1
 
             Console.WriteLine("\nInverse Matrix Result: ");
             PrintMatrix(inverse);
+
+            // Store in matrices 4, 5, or 6
+            Console.Write("\nWould you like to store this inverse matrix? (y/n): ");
+            string Choice = Console.ReadLine();
+            if (Choice.ToLower() == "y")
+            {
+                Console.Write("Select matrix slot to store inverse (4-6): ");
+                if (int.TryParse(Console.ReadLine(), out int slot) && slot >= 4 && slot <= 6)
+                {
+                    matrices[slot - 1] = inverse;
+                    Console.WriteLine($"Inverse matrix stored in Matrix{slot}");
+                }
+                else
+                {
+                    Console.WriteLine("Invalid slot selection. Please choose 4, 5, or 6.");
+                }
+            }
         }
 
         static double Determinant(double[,] A)
@@ -398,4 +422,3 @@ namespace ConsoleApp1
         }
     }
 }
-
